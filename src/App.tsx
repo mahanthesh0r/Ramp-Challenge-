@@ -13,6 +13,7 @@ export function App() {
   const { data: paginatedTransactions, ...paginatedTransactionsUtils } = usePaginatedTransactions()
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
   const [isLoading, setIsLoading] = useState(false)
+  const [isPagination, setIsPagination] = useState(true)
 
   const transactions = useMemo(
     () => paginatedTransactions?.data ?? transactionsByEmployee ?? null,
@@ -20,13 +21,13 @@ export function App() {
   )
 
   const loadAllTransactions = useCallback(async () => {
+    
     setIsLoading(true)
     transactionsByEmployeeUtils.invalidateData()
 
     await employeeUtils.fetchAll()
     setIsLoading(false)
     await paginatedTransactionsUtils.fetchAll()
-
     
   }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils])
 
@@ -41,8 +42,18 @@ export function App() {
   useEffect(() => {
     if (employees === null && !employeeUtils.loading) {
       loadAllTransactions()
+      
     }
   }, [employeeUtils.loading, employees, loadAllTransactions])
+
+  useEffect(() => {
+    setIsPagination(true)
+    if(paginatedTransactions?.nextPage === null || undefined){
+    setIsPagination(true)
+    } if(paginatedTransactions?.nextPage !== null && paginatedTransactions?.nextPage !== undefined){
+      setIsPagination(false)
+    }
+  })
 
   return (
     <Fragment>
@@ -72,7 +83,6 @@ export function App() {
               await loadTransactionsByEmployee(newValue.id)
             }
 
-            
           }}
         />
 
@@ -80,11 +90,11 @@ export function App() {
 
         <div className="RampGrid">
           <Transactions transactions={transactions} />
-
+          
           {transactions !== null && (
             <button
               className="RampButton"
-              disabled={paginatedTransactionsUtils.loading}
+              disabled={paginatedTransactionsUtils.loading || isPagination}
               onClick={async () => {
                 await loadAllTransactions()
               }}

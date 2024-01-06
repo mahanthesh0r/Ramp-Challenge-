@@ -34,8 +34,10 @@ export function usePaginatedTransactions(): PaginatedTransactionsResult {
 
       console.log("Res 1", response.data)
       console.log("Pre 2", previousResponse.data)
+      console.log("Pagination: ", response.nextPage)
 
       console.log("DATA: ", resData)
+
 
       return { 
         data: resData,
