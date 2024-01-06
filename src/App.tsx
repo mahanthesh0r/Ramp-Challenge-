@@ -78,8 +78,10 @@ export function App() {
             } 
 
             if(newValue.id === "") {
+              //console.log("All")
               await loadAllTransactions() 
             } else {
+              // console.log("called")
               await loadTransactionsByEmployee(newValue.id)
             }
 
